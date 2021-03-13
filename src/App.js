@@ -1,21 +1,26 @@
-import {useState, useEffect} from 'react'
-import './App.css';
-import Home from "./components/Home";
+import React, {Component} from 'react';
 import Login from "./components/Login";
+import Home from "./components/Home";
 
-function App() {
+class App extends Component {
 
-    const [isLogin, setLogin] = useState(false)
-    useEffect(() =>{
+    state = {
+        isLogin: false
+    }
+
+    async componentDidMount() {
         const jwt = localStorage.getItem("token");
         if (jwt) {
-          setLogin(true)
+            this.setState({isLogin: true})
         }
+    }
 
-    },[isLogin])
 
-    if (!isLogin) return <Login/>
-    else return <Home/>
+    render() {
+        if (!this.state.isLogin) return <Login/>
+        else return <Home/>
+
+    }
 }
 
 export default App;

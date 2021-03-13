@@ -9,6 +9,8 @@
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.21.1",
     "chart.js": "^2.9.4",
+    "js-file-download": "^0.4.12",
+    "json2csv": "^5.0.6",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
@@ -17,6 +19,7 @@
     "react-datetime": "^3.0.4",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.3",
+    "react-toastify": "^7.0.3",
     "web-vitals": "^1.1.0"
   },
   "scripts": {

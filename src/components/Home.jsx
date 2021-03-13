@@ -6,7 +6,15 @@ import moment from 'moment';
 import httpService from "../services/httpService";
 import {DATA_URL} from "../config.json"
 import {Line} from 'react-chartjs-2';
+
 import _ from 'lodash';
+import fileDownload from  'js-file-download'
+import {parse} from 'json2csv'
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 
 import React from 'react';
 
@@ -100,11 +108,7 @@ const mme_counters = [
     {path: 'MaxConnectedUE', label: 'Avg Number_Connected_UEs'}
 ]
 
-const pgw_counters = [{path: 'AttPaging_FirstAttempt', label: 'VS_paging_all_req_1stTry'},
-    {path: 'NbrSuccessTAU', label: 'VS_UE_TAU_all_succ'},
-    {path: 'TauInterMmeSucc', label: 'VS_UE_TAU_IrMME_all_succ'},
-    {path: 'AttTAU', label: 'VS_UE_TAU_all_req'},
-    {path: 'TauInterMmeAtt', label: 'VS_UE_TAU_IrMME_all_req'}]
+const pgw_counters = [{path: 'test data', label: 'test data'}]
 
 
 const period_one = [
@@ -126,6 +130,9 @@ const columnHeading = [
     {path: 'value', label: 'Value'}
 ]
 
+const fields = ['date', 'value'];
+const opts = { fields, excelStrings:true };
+
 
 function Home(props) {
 
@@ -137,7 +144,6 @@ function Home(props) {
     const [startDate, setStartDate] = useState(moment().subtract(2, "days"))
     const [endDate, setEndDate] = useState(moment());
     const [showProgress, setShowProgress] = useState(false)
-    const [message, setMessage] = useState("")
     const [data, setData] = useState([])
     const [reportName, setReportName] = useState("")
     const [sortColumn, setSortColumn] = useState({path:"date", orderBy:"asc"})
@@ -164,9 +170,11 @@ function Home(props) {
 
         } catch (ex) {
             if (ex.response && ex.response.data) {
-                setMessage(ex.response.data)
+                toast.error(ex.response.data)
+
             } else {
-                setMessage(ex.message)
+                toast.error(ex.message)
+
             }
 
         } finally {
@@ -217,6 +225,20 @@ function Home(props) {
         }
 
     }
+    const handleLogOut = () => {
+        localStorage.clear();
+        window.location = "/"
+    }
+
+    const handleExport =() =>{
+        try {
+            const csv = parse(data,opts)
+            fileDownload(csv, `${reportName}.csv`)
+        } catch (ex) {
+            console.log(ex)
+            toast.error("Error in Exporting file.Please try again or contact SysAdmin")
+        }
+    }
 
     const chartData = {
         labels: generateChartData(data).labels,
@@ -247,6 +269,8 @@ function Home(props) {
 
     return (
         <div className="main-container">
+            <ToastContainer/>
+
             <div className="form-container">
                 <form onSubmit={handleFormSubmit}>
                     <div className="form-group">
@@ -311,13 +335,18 @@ function Home(props) {
 
                 </form>
             </div>
+            <div className="logout-container">
+                <button onClick={handleLogOut} className="logout-btn"><i
+                    className="fa fa-power-off"/>&nbsp;LogOut
+                </button>
+            </div>
             {data.length > 0 && <div className="content-container">
                 <div className="chart-container">
                     <Line data={chartData}/>
 
                 </div>
                 <div className="table-container">
-                    <button className="export-btn">Export&nbsp;<i className="far fa-file-excel"></i></button>
+                    <button className="export-btn" onClick={handleExport}>Export&nbsp;<i className="far fa-file-excel"></i></button>
                     <table>
                         <thead>
                         <tr>

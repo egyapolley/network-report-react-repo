@@ -105,7 +105,7 @@ ul .form-label {
 .chart-container {
     background: #fff;
     margin: 5px auto 20px auto;
-    width: 60vw;
+    width: 55vw;
     border-radius: 10px;
     box-shadow: 0 0 0 10px rgba(255,255,255,0.3);
 
@@ -173,6 +173,27 @@ ul .form-label {
 }
 i.sort {
     margin-left: 2px;
+}
+
+.logout-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding:20px 15px 0 0
+}
+
+.logout-container button {
+    display: inline-block;
+    padding: 5px 20px;
+    color: #f16cb4;
+    cursor: pointer;
+    font-weight: bolder;
+
+}
+
+.logout-container button:hover {
+    box-shadow: 0 0 2px 5px #999191;
+
 }
 
 
