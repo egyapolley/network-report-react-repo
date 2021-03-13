@@ -218,7 +218,7 @@ function Home(props) {
         const {path, orderBy} = sortColumn
         if ( column.path ===path){
             if (orderBy === 'asc'){
-                return <i class="fas fa-sort-up sort"/>
+                return <i className="fas fa-sort-up sort"/>
             }else {
                 return <i className="fas fa-sort-down sort"/>
             }
@@ -346,7 +346,7 @@ function Home(props) {
 
                 </div>
                 <div className="table-container">
-                    <button className="export-btn" onClick={handleExport}>Export&nbsp;<i className="far fa-file-excel"></i></button>
+                    <button className="export-btn" onClick={handleExport}>Export&nbsp;<i className="far fa-file-excel"/></button>
                     <table>
                         <thead>
                         <tr>
