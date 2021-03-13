@@ -12,7 +12,7 @@ function App() {
           setLogin(true)
         }
 
-    },[])
+    },[isLogin])
 
     if (!isLogin) return <Login/>
     else return <Home/>

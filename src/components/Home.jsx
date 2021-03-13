@@ -2,6 +2,11 @@ import './Home.css'
 import {useState} from 'react'
 import Datetime from 'react-datetime';
 import "react-datetime/css/react-datetime.css";
+import moment from 'moment';
+import httpService from "../services/httpService";
+import {DATA_URL} from "../config.json"
+import {Line} from 'react-chartjs-2';
+import _ from 'lodash';
 
 import React from 'react';
 
@@ -116,20 +121,136 @@ const period_two = [
     {path: "45mins", label: 190},
 ]
 
+const columnHeading = [
+    {path: 'date', label: 'Date/Time'},
+    {path: 'value', label: 'Value'}
+]
+
+
 function Home(props) {
 
     const [node, setNode] = useState("mme");
     const reportOptions = node === "pgw" ? pgw_counters : mme_counters;
-    const [reportCounter, setReportCounter] = useState(reportOptions[0]);
-    const [period, setPeriod] = useState("daily")
 
+    const [reportCounter, setReportCounter] = useState(reportOptions[0].path);
+    const [period, setPeriod] = useState("daily")
+    const [startDate, setStartDate] = useState(moment().subtract(2, "days"))
+    const [endDate, setEndDate] = useState(moment());
+    const [showProgress, setShowProgress] = useState(false)
+    const [message, setMessage] = useState("")
+    const [data, setData] = useState([])
+    const [reportName, setReportName] = useState("")
+    const [sortColumn, setSortColumn] = useState({path:"date", orderBy:"asc"})
+
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
+        await doSubmit()
+    }
+
+    const doSubmit = async () => {
+        const body = {
+            node: node,
+            reportCounter: reportCounter,
+            period: period,
+            startDate: startDate.format("YYYY-MM-DD HH:mm:ss"),
+            endDate: endDate.format("YYYY-MM-DD HH:mm:ss")
+        }
+
+        try {
+            setShowProgress(true)
+            const {data: response} = await httpService.get(DATA_URL, {params: body});
+            setData(response.data)
+            setReportName(response.reportName)
+
+        } catch (ex) {
+            if (ex.response && ex.response.data) {
+                setMessage(ex.response.data)
+            } else {
+                setMessage(ex.message)
+            }
+
+        } finally {
+            setShowProgress(false)
+        }
+
+    }
+
+    const getTableData = (data) => {
+        return _.orderBy(data, [sortColumn.path], sortColumn.orderBy)
+
+    }
+
+    const generateChartData = (data) => {
+        const labels = []
+        const dataValues = []
+
+        if (data.length > 0) {
+            for (const item of data) {
+                labels.push(item.date)
+                dataValues.push(item.value)
+
+            }
+        }
+        return {labels: labels, dataSet: dataValues}
+
+    }
+
+    const handleTableSorting = (column) => {
+        const s_column = {...sortColumn}
+        if (column.path === s_column.path){
+            s_column.orderBy = s_column.orderBy==='asc'?"desc":"asc"
+        }else {
+            s_column.path =column.path
+            s_column.orderBy="asc"
+        }
+        setSortColumn(s_column)
+    }
+
+    const generateSortImage =(column) => {
+        const {path, orderBy} = sortColumn
+        if ( column.path ===path){
+            if (orderBy === 'asc'){
+                return <i class="fas fa-sort-up sort"/>
+            }else {
+                return <i className="fas fa-sort-down sort"/>
+            }
+        }
+
+    }
+
+    const chartData = {
+        labels: generateChartData(data).labels,
+        datasets: [
+            {
+                label: reportName,
+                fill: false,
+                lineTension: 0.1,
+                backgroundColor: 'rgba(75,192,192,0.4)',
+                borderColor: 'deeppink',
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: 'rgb(192,159,75)',
+                pointBackgroundColor: '#fff',
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+                pointHoverBorderColor: 'deeppink',
+                pointHoverBorderWidth: 2,
+                pointRadius: 1,
+                pointHitRadius: 10,
+                data: generateChartData(data).dataSet
+            }
+        ]
+    };
 
     return (
         <div className="main-container">
             <div className="form-container">
-                <form action="">
+                <form onSubmit={handleFormSubmit}>
                     <div className="form-group">
-                        <label htmlFor="node">Select Network Element:</label>
+                        <label htmlFor="node" className="form-label">Select Network Element:</label>
                         <select name="node" id="node" value={node} onChange={event => setNode(event.target.value)}
                                 required>
                             <option value="mme">MME</option>
@@ -137,7 +258,7 @@ function Home(props) {
                         </select>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="reportCounter">Select Report Counter:</label>
+                        <label htmlFor="reportCounter" className="form-label">Select Report Counter:</label>
                         <select name="reportCounter" id="reportCounter" value={reportCounter}
                                 onChange={event => setReportCounter(event.target.value)}>
                             {reportOptions.map((item, index) => <option key={index}
@@ -148,7 +269,7 @@ function Home(props) {
                         <span className="label">Periodicity:</span>
                         <div className="period-group-container">
                             <ul className="periodicity-group">
-                                {period_one.map((item, index) => <li key={index}><label><input
+                                {period_one.map((item, index) => <li key={index}><label className="form-label"><input
                                     type="radio" name="period"
                                     checked={item.path === period}
                                     onChange={event => setPeriod(event.target.value)}
@@ -159,7 +280,7 @@ function Home(props) {
                             </ul>
                             <ul className="periodicity-group">
                                 {period_two.map((item, index) => <li key={index}>
-                                    <label>{String.fromCharCode(item.label)}&nbsp;Hour<input
+                                    <label className="form-label">{String.fromCharCode(item.label)} Hour&nbsp;<input
                                         type="radio" name="period" value={item.path}
                                         checked={item.path === period}
                                         onChange={event => setPeriod(event.target.value)}
@@ -171,38 +292,49 @@ function Home(props) {
                     <div className="form-date">
                         <span className="label">Start Date:</span>
                         <div className="date-wrapper">
-                            <Datetime/>
+                            <Datetime value={startDate} onChange={date => setStartDate(date)} dateFormat="DD-MM-YYYY"/>
                         </div>
                     </div>
                     <div className="form-date">
                         <span className="label">End Date:</span>
                         <div className="date-wrapper">
-                            <Datetime/>
+                            <Datetime value={endDate} onChange={date => setEndDate(date)} dateFormat="DD-MM-YYYY"/>
                         </div>
                     </div>
+                    {showProgress && <div className="progressIndicator">
+                        <img src="/images/ajax-loader.gif" alt="Processing"/>
+                    </div>}
 
                     <div className="form-button">
-
+                        <button className="btn btn-submit">Submit</button>
                     </div>
 
                 </form>
             </div>
-            <div className="content-container">
+            {data.length > 0 && <div className="content-container">
                 <div className="chart-container">
+                    <Line data={chartData}/>
 
                 </div>
                 <div className="table-container">
+                    <button className="export-btn">Export&nbsp;<i className="far fa-file-excel"></i></button>
                     <table>
                         <thead>
+                        <tr>
+                            {columnHeading.map((column) => <th key={column.path} onClick={()=>handleTableSorting(column)}>{column.label}{generateSortImage(column)}</th>)}
+                        </tr>
 
                         </thead>
                         <tbody>
-
+                        {getTableData(data).map((row, index) => <tr key={index}>
+                            <td>{row.date}</td>
+                            <td>{row.value}</td>
+                        </tr>)}
                         </tbody>
                     </table>
                 </div>
+            </div>}
 
-            </div>
         </div>
     );
 }
