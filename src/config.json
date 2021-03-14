@@ -1,4 +1,4 @@
 {
-  "LOGIN_URL": "http://172.25.33.141:4000/login",
-  "DATA_URL": "http://172.25.33.141:4000/data"
+  "LOGIN_URL": "http://pmreport.surflinegh.com:6100/login",
+  "DATA_URL": "http://pmreport.surflinegh.com:6100/data"
 }
