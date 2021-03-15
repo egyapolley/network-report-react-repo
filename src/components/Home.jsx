@@ -346,7 +346,6 @@ function Home(props) {
 
                 </div>
                 <div className="table-container">
-                    <button className="export-btn" onClick={handleExport}>Export&nbsp;<i className="far fa-file-excel"/></button>
                     <table>
                         <thead>
                         <tr>
@@ -361,6 +360,7 @@ function Home(props) {
                         </tr>)}
                         </tbody>
                     </table>
+                    <button className="export-btn" onClick={handleExport}>Export&nbsp;<i className="far fa-file-excel"/></button>
                 </div>
             </div>}
 

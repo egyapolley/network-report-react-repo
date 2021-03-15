@@ -115,16 +115,16 @@ ul .form-label {
 
 .table-container {
     position: relative;
+    display: flex;
+    justify-content:center;
+    align-items: flex-start;
+    flex-wrap: nowrap;
 }
 
 .export-btn {
-    position: absolute;
-    top: 10px;
-    right: 5px;
     display: inline-block;
     padding: 10px 30px;
-    margin-right: 50px;
-    margin-top: 5px;
+    margin: 5px 0 0 30px;
     cursor: pointer;
     font-weight: bolder;
     background: green;
@@ -147,7 +147,6 @@ ul .form-label {
 .table-container table {
     border-collapse: collapse;
     font-size: 13px;
-    margin: 0 auto;
     width: 350px;
 
 }
@@ -193,6 +192,53 @@ i.sort {
 
 .logout-container button:hover {
     box-shadow: 0 0 2px 5px #999191;
+
+}
+
+@media all and (max-width: 700px) {
+
+    .main-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+
+    .form-container {
+        margin: 55px auto 10px auto;
+        position: static;
+        top: auto;
+        left: auto;
+        bottom: auto;
+    }
+
+    .logout-container {
+        display: block;
+        position: absolute;
+        top: 0;
+    }
+    .export-btn {
+        margin-bottom: 20px;
+    }
+
+
+    .content-container {
+        margin-left: 0;
+    }
+
+    .table-container {
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+
+
 
 }
 
